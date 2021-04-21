@@ -472,6 +472,48 @@ func TestUnnamedType(t *testing.T) {
 	})
 }
 
+type intList []int
+
+func (l *intList) Unmarshal(value string) error {
+	strNums := strings.Split(value, ",")
+	for _, strNum := range strNums {
+		num, err := strconv.Atoi(strNum)
+		if err != nil {
+			return err
+		}
+
+		*l = append(*l, num)
+
+	}
+	return nil
+}
+
+func TestList(t *testing.T) {
+	t.Run("int list", func(t *testing.T) {
+		r := buildRequest("list=1,2,3,4,5")
+		l := intList([]int{1, 2, 3, 4, 5})
+
+		type TestStruct struct {
+			Ints intList `form:"list"`
+		}
+
+		expected := TestStruct{
+			Ints: l,
+		}
+
+		var actual TestStruct
+
+		err := Unmarshal(r, &actual)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if !reflect.DeepEqual(actual, expected) {
+			t.Errorf("%v not equal to %v", actual, expected)
+		}
+	})
+}
+
 func buildRequest(query string) *http.Request {
 	r := &http.Request{Method: http.MethodGet}
 	r.URL, _ = url.Parse("http://localhost/?" + query)
