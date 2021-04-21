@@ -46,7 +46,10 @@ func (d *decodeState) unmarshal(v interface{}) error {
 
 		u, pv := deref(rv.Field(i))
 		if u != nil {
-			return u.UnmarshalFormField(value)
+			if err := u.UnmarshalFormField(value); err != nil {
+				return err
+			}
+			continue
 		}
 
 		if err := set(pv, value); err != nil {
@@ -87,7 +90,7 @@ func set(v reflect.Value, value string) error {
 		}
 		v.SetString(value)
 	default:
-		panic(fmt.Sprintf("unhandled type: %s", v.Type().Name()))
+		panic(fmt.Sprintf("unhandled type: %s (%v)", v.Type().Name(), v.Kind()))
 	}
 
 	return nil
@@ -95,9 +98,17 @@ func set(v reflect.Value, value string) error {
 
 // derefs pointer until finds an FieldUnmarshaler or concrete type
 func deref(v reflect.Value) (FieldUnmarshaler, reflect.Value) {
+	v0 := v
+	haveAddr := false
+
+	if v.Kind() != reflect.Ptr && v.CanAddr() {
+		haveAddr = true
+		v = v.Addr()
+	}
+
 	for {
 		if v.Kind() == reflect.Interface {
-			fmt.Printf("an interface. dont know what to do yet")
+			return nil, v // an interface. dont know what to do yet
 		}
 
 		if v.Kind() != reflect.Ptr {
@@ -114,7 +125,12 @@ func deref(v reflect.Value) (FieldUnmarshaler, reflect.Value) {
 			}
 		}
 
-		v = v.Elem()
+		if haveAddr {
+			v = v0
+			haveAddr = false
+		} else {
+			v = v.Elem()
+		}
 	}
 
 	return nil, v
