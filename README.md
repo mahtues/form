@@ -70,7 +70,7 @@ import (
 
 type form struct {
     Name         string         `form:"name"`
-    ReversedName reversedString `form:"name"` <-- type with custom decoding
+    ReversedName reversedString `form:"name"` // <-- type with custom decoding
 }
 
 // type implementing form.FieldUnmarshaler
@@ -116,7 +116,7 @@ import (
 
 type form struct {
     Name         string       `form:"name"`
-    ReversedName simpleStruct `form:"name"` <-- type with custom decoding
+    ReversedName simpleStruct `form:"name"` // <-- type with custom decoding
 }
 
 // type implementing form.FieldUnmarshaler
