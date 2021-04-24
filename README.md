@@ -7,8 +7,8 @@ Go struct.
 
 ```Go
 import (
-	"net/http"
-	"net/url"
+    "net/http"
+    "net/url"
 
     "github.com/mahtues/form" // <-- import the form package
 )
@@ -22,13 +22,13 @@ type form struct {
 }
 
 func main() {
-	r := &http.Request{Method: http.MethodGet}
-	r.URL, _ = url.Parse("http://localhost/?name=alice&age=25&somebool=true")
+    r := &http.Request{Method: http.MethodGet}
+    r.URL, _ = url.Parse("http://localhost/?name=alice&age=25&somebool=true")
 
     var target form
 
     // use form.Unmarshal(*http.Request, interface{}) to decode the form into
-    // the provided stuct.
+    // the defined struct.
     if err := form.Unmarshal(r, &target); err != nil {
         // errors are due to incompatible types
         panic(err)
@@ -39,3 +39,10 @@ func main() {
     fmt.Println(target.SomeBool) // stdout: true
 }
 ```
+
+This is a simple usage for the supported primitive types:
+- `string`
+- `bool`
+- `int`, `int8`, `int16`, `int32`, `int64`
+- `uint`, `uint8`, `uint16`, `uint32`, `uint64`
+- `float32`, `float64`
