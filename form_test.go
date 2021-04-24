@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
-	"strconv"
-	"strings"
 	"testing"
 )
 
@@ -13,15 +11,15 @@ func TestInt(t *testing.T) {
 	t.Run("primitive int", func(t *testing.T) {
 		r := buildRequest("a=4")
 
-		type TestStruct struct {
+		type testStruct struct {
 			A int `form:"a"`
 		}
 
-		expected := TestStruct{
+		expected := testStruct{
 			A: 4,
 		}
 
-		var actual TestStruct
+		var actual testStruct
 
 		err := Unmarshal(r, &actual)
 		if err != nil {
